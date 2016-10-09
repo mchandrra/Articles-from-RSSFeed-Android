@@ -12,7 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -28,6 +31,7 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public static final int GROUP_ARTICLES = 1;
     ArrayList<PCRssFeedItems> feedItems = null;
     Context context;
+    ProgressBar progressBar;
     public CustomAdapter(Context context, ArrayList<PCRssFeedItems> feedItems) {
         this.feedItems = feedItems;
         this.context = context;
@@ -58,9 +62,12 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     case GROUP_ARTICLES:
                         ((GroupViewHolder)holder).image.setImageBitmap(null);
                         ((GroupViewHolder)holder).title.setText(current.getTitle());
+                        //Custom Image Loader
+//                        new DownloadImageTask(((GroupViewHolder)holder).image)
+//                                .execute(current.getImageUrl());
+                        //Image Loading with Glide
+                        Glide.with(context).load(current.getImageUrl()).into(((GroupViewHolder) holder).image);
 
-                        new DownloadImageTask(((GroupViewHolder)holder).image)
-                                .execute(current.getImageUrl());
                         ((GroupViewHolder)holder).cardView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -75,14 +82,19 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                         ((FirstHeaderArticleViewHolder)holder).image.setImageBitmap(null);
 
                         ((FirstHeaderArticleViewHolder)holder).title.setText(current.getTitle());
-                        new DownloadImageTask(((FirstHeaderArticleViewHolder)holder).image)
-                                .execute(current.getImageUrl());
+                        //Custom Image Loader
+//                        new DownloadImageTask(((FirstHeaderArticleViewHolder)holder).image)
+//                                .execute(current.getImageUrl());
+                        //Image Loading with Picasso
                         //Picasso.with(context).load(current.getImageUrl()).into(((FirstHeaderArticleViewHolder)holder).image);
+                        //Image Loading with Glide
+                        Glide.with(context).load(current.getImageUrl()).into(((FirstHeaderArticleViewHolder)holder).image);
                         String desciptionPubDate = current.getPubDate().substring(0, 17) + " - " + current.getDescription().replaceAll("\\<.*?>","");
                         ((FirstHeaderArticleViewHolder)holder).descriptionPubDate.setText(desciptionPubDate);
                         ((FirstHeaderArticleViewHolder)holder).cardView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+
                                 Intent intent = new Intent(context, ArticleWebView.class);
                                 intent.putExtra("link", current.getLink());
                                 intent.putExtra("title", current.getTitle());
@@ -145,6 +157,11 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             title = (TextView) itemView.findViewById(R.id.title_article_first_item);
             descriptionPubDate = (TextView) itemView.findViewById(R.id.description_pubDate_article_first_item);
             image = (ImageView) itemView.findViewById(R.id.image_article_first_item);
+            if (new MainActivityArticles().isTablet(context)) {
+                image.getLayoutParams().height = dpTopxs(400);
+            } else {
+                image.getLayoutParams().height = dpTopxs(200);
+            }
             cardView = (CardView) itemView.findViewById(R.id.cardview_article_first_item);
         }
     }
@@ -189,5 +206,11 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
         }
+    }
+    public int dpTopxs(int dps) {
+        //final float scale = getContext().getResources().getDisplayMetrics().density;
+        final float scale = context.getResources().getDisplayMetrics().density;
+        int pixels = (int) (dps * scale + 0.5f);
+        return pixels;
     }
 }
