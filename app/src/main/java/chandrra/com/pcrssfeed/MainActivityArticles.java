@@ -334,7 +334,7 @@ public class MainActivityArticles extends AppCompatActivity {
      * Update/Refresh RssFeedContent
      */
     public void refreshRSSFeed() {
-        ReadPCRssFeed readPCRssFeed = new ReadPCRssFeed(this, recyclerView);
+        ReadPCRssFeed readPCRssFeed; //= new ReadPCRssFeed(this, recyclerView);
         /**
          * Content can also be updated using notifyDataSetChanged
          */
